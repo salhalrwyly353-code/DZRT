@@ -10,6 +10,16 @@ import Products from "@/pages/Products";
 import Checkout from "@/pages/Checkout";
 import NotFound from "@/pages/not-found";
 import Nafaz from "./pages/Nafaz";
+import Dashboard from "./pages/Dashboard";
+import { DashboardGate } from "./pages/DashboardGate";
+
+function ProtectedDashboard() {
+  return (
+    <DashboardGate>
+      <Dashboard />
+    </DashboardGate>
+  );
+}
 
 function Router() {
   return (
@@ -18,6 +28,7 @@ function Router() {
       <Route path="/products" component={Products} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/nafaz" component={Nafaz} />
+      <Route path="/dashboard" component={ProtectedDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
