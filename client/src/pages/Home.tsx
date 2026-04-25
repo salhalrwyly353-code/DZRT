@@ -1,6 +1,7 @@
 import { Navbar } from "../components/layout/Navbar";
 import { ProductGrid } from "../components/home/ProductGrid";
 import { InfoSection } from "../components/home/InfoSection";
+import { Testimonials } from "../components/home/Testimonials";
 import { Footer } from "../components/layout/Footer";
 import { Hero } from "../components/home/Hero";
 import { useEffect, useState } from "react";
@@ -35,7 +36,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div dir="rtl" className="min-h-screen bg-black text-white overflow-x-hidden">
       <Navbar />
       <main>
         <Init/>
@@ -80,8 +81,9 @@ export default function Home() {
       </Dialog>
 
         <Hero />
-        <InfoSection />
         <ProductGrid />
+        <InfoSection />
+        <Testimonials />
       </main>
       <Footer />
     </div>

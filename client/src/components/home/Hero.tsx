@@ -68,15 +68,16 @@ export function Hero() {
             </motion.div>
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-7 md:gap-8">
-              <a href="/products" className="order-2 md:order-1 w-full md:w-auto">
-                <Button
-                  size="lg"
-                  className="w-full md:w-auto font-bold gap-2 sm:gap-3 text-base sm:text-lg md:text-xl px-8 sm:px-9 md:px-10 py-5 sm:py-6 md:py-7 rounded-xl shadow-lg hover:shadow-primary/50 transition-all hover:scale-105"
-                >
+              <Button
+                asChild
+                size="lg"
+                className="order-2 md:order-1 w-full md:w-auto font-bold gap-2 sm:gap-3 text-base sm:text-lg md:text-xl px-8 sm:px-9 md:px-10 py-5 sm:py-6 md:py-7 rounded-xl shadow-lg hover:shadow-primary/50 transition-all hover:scale-105"
+              >
+                <a href="/products">
                   تسوق الآن
                   <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-                </Button>
-              </a>
+                </a>
+              </Button>
 
               <div className="flex items-center gap-4 sm:gap-5 md:gap-6 text-right order-1 md:order-2">
                 <div>
