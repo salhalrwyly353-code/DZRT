@@ -685,7 +685,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20 p-4">
-      <PromoPopup open={showPromoPopup} onClose={() => setShowPromoPopup(false)} />
+      <PromoPopup open={false} onClose={() => setShowPromoPopup(false)} />
 
       <div className="max-w-4xl mx-auto">
         {/* Progress Stepper */}
