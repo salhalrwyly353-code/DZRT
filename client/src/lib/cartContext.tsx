@@ -16,8 +16,8 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[]
   addItem: (product: any, quantity?: number) => void
-  removeItem: (productId: number) => void
-  updateQuantity: (productId: number, quantity: number) => void
+  removeItem: (lineId: number) => void
+  updateQuantity: (lineId: number, quantity: number) => void
   clearCart: () => void
   getItemCount: () => number
   getSubtotal: () => number
@@ -43,16 +43,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = (product: any, quantity = 1) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.productId === product.id)
+      const existing = prev.find(
+        (item) => item.productId === product.id && item.strength === product.strength,
+      )
       if (existing) {
         return prev.map((item) =>
-          item.productId === product.id ? { ...item, quantity: item.quantity + quantity } : item,
+          item.id === existing.id ? { ...item, quantity: item.quantity + quantity } : item,
         )
       }
       return [
         ...prev,
         {
-          id: Date.now(),
+          id: Date.now() + Math.floor(Math.random() * 1000),
           productId: product.id,
           nameAr: product.nameAr,
           nameEn: product.nameEn,
@@ -65,16 +67,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const removeItem = (productId: number) => {
-    setItems((prev) => prev.filter((item) => item.productId !== productId))
+  const removeItem = (lineId: number) => {
+    setItems((prev) => prev.filter((item) => item.id !== lineId))
   }
 
-  const updateQuantity = (productId: number, quantity: number) => {
+  const updateQuantity = (lineId: number, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(productId)
+      removeItem(lineId)
       return
     }
-    setItems((prev) => prev.map((item) => (item.productId === productId ? { ...item, quantity } : item)))
+    setItems((prev) => prev.map((item) => (item.id === lineId ? { ...item, quantity } : item)))
   }
 
   const clearCart = () => {

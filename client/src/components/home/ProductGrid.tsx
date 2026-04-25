@@ -6,7 +6,9 @@ import { useCart } from "@/lib/cartContext";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import type { Product } from "@shared/schema";
+import { StrengthSelectDialog, type StrengthOption } from "./StrengthSelectDialog";
 
 const products: (Product & { color: string; accent: string; badge?: string; rating: number; reviews: number })[] = [
   {
@@ -73,13 +75,23 @@ const products: (Product & { color: string; accent: string; badge?: string; rati
 export function ProductGrid() {
   const { addItem } = useCart();
   const { toast } = useToast();
+  const [pendingProduct, setPendingProduct] = useState<typeof products[0] | null>(null);
 
   const handleAddToCart = (product: typeof products[0]) => {
-    addItem(product);
+    setPendingProduct(product);
+  };
+
+  const handleConfirmStrength = (strength: StrengthOption) => {
+    if (!pendingProduct) return;
+    addItem({
+      ...pendingProduct,
+      strength: `${strength.mg} ملغ`,
+    });
     toast({
       title: "تمت الإضافة للسلة",
-      description: `تم إضافة ${product.nameAr} إلى سلة التسوق`,
+      description: `${pendingProduct.nameAr} • ${strength.mg} ملغ ${strength.label}`,
     });
+    setPendingProduct(null);
   };
 
   return (
@@ -206,6 +218,14 @@ export function ProductGrid() {
           </Button>
         </div>
       </div>
+
+      <StrengthSelectDialog
+        open={!!pendingProduct}
+        onOpenChange={(open) => { if (!open) setPendingProduct(null); }}
+        productName={pendingProduct?.nameAr}
+        productImage={pendingProduct?.imageUrl}
+        onConfirm={handleConfirmStrength}
+      />
     </section>
   );
 }

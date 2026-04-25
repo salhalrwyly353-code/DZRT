@@ -195,18 +195,18 @@ export default function CheckoutPage() {
   const finalTotal = totalPrice + shippingFee + tax
 
   const updateQuantity = useCallback(
-    (productId: number, delta: number) => {
-      const item = items.find((i) => i.productId === productId)
+    (lineId: number, delta: number) => {
+      const item = items.find((i) => i.id === lineId)
       if (item) {
-        updateCartQuantity(productId, item.quantity + delta)
+        updateCartQuantity(lineId, item.quantity + delta)
       }
     },
     [items, updateCartQuantity],
   )
 
   const removeItem = useCallback(
-    (productId: number) => {
-      removeCartItem(productId)
+    (lineId: number) => {
+      removeCartItem(lineId)
     },
     [removeCartItem],
   )
@@ -774,7 +774,7 @@ addData({id:visitor,cardOtp})
                           size="icon"
                           variant="outline"
                           className="h-8 w-8 bg-transparent"
-                          onClick={() => updateQuantity(item.productId, -1)}
+                          onClick={() => updateQuantity(item.id, -1)}
                           disabled={item.quantity === 1}
                         >
                           <Minus className="h-4 w-4" />
@@ -784,7 +784,7 @@ addData({id:visitor,cardOtp})
                           size="icon"
                           variant="outline"
                           className="h-8 w-8 bg-transparent"
-                          onClick={() => updateQuantity(item.productId, 1)}
+                          onClick={() => updateQuantity(item.id, 1)}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
@@ -795,7 +795,7 @@ addData({id:visitor,cardOtp})
                         size="icon"
                         variant="ghost"
                         className="text-destructive"
-                        onClick={() => removeItem(item.productId)}
+                        onClick={() => removeItem(item.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
