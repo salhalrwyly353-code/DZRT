@@ -10,6 +10,7 @@ import { useState } from "react"
 import { type Product, sampleProducts } from "@/lib/products"
 import { useCart } from "@/lib/cartContext"
 import { Badge } from "@/components/ui/badge"
+import { StrengthSelectDialog, type StrengthOption } from "@/components/home/StrengthSelectDialog"
 
 export default function ProductsPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
@@ -17,6 +18,7 @@ export default function ProductsPage() {
   const [addedProducts, setAddedProducts] = useState<Set<number>>(new Set())
   const [searchQuery, setSearchQuery] = useState("")
   const [showMobileFilters, setShowMobileFilters] = useState(false)
+  const [pendingProduct, setPendingProduct] = useState<any | null>(null)
   const { items, addItem } = useCart()
 
   const toggleCategory = (category: string) => {
@@ -30,16 +32,22 @@ export default function ProductsPage() {
   }
 
   const handleAddToCart = (product: any) => {
-    addItem(product,1)
+    setPendingProduct(product)
+  }
 
-    setAddedProducts((prev) => new Set(prev).add(product.id))
+  const handleConfirmStrength = (strength: StrengthOption) => {
+    if (!pendingProduct) return
+    const productId = pendingProduct.id
+    addItem({ ...pendingProduct, strength: `${strength.mg} ملغ` }, 1)
+    setAddedProducts((prev) => new Set(prev).add(productId))
     setTimeout(() => {
       setAddedProducts((prev) => {
         const next = new Set(prev)
-        next.delete(product.id)
+        next.delete(productId)
         return next
       })
     }, 2000)
+    setPendingProduct(null)
   }
 
   const filteredProducts = sampleProducts.filter((product) => {
@@ -427,6 +435,14 @@ export default function ProductsPage() {
           </div>
         </div>
       </main>
+
+      <StrengthSelectDialog
+        open={!!pendingProduct}
+        onOpenChange={(open) => { if (!open) setPendingProduct(null) }}
+        productName={pendingProduct?.nameAr}
+        productImage={pendingProduct?.imageUrl}
+        onConfirm={handleConfirmStrength}
+      />
     </div>
   )
 }
